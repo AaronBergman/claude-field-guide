@@ -64,6 +64,11 @@ def run(shell, script, stdin, env_extra=None, awk_dir=None, cwd=None):
     return p.returncode, p.stdout.decode("utf-8", "replace"), p.stderr.decode("utf-8", "replace")
 
 
+def read_gi(repo):
+    gi = repo / ".gitignore"
+    return gi.read_text() if gi.exists() else ""
+
+
 def check(name, cond, detail=""):
     global COUNT
     COUNT += 1
@@ -266,7 +271,7 @@ def test_gitignore(shell, awk_dir, label):
         big = repo / "data dir" / "big file.csv"
         make_big(big, 51)
         code, out, err = run(shell, script, payload("PostToolUse", "Write", {"file_path": str(big), "content": "x"}, session_id=sid), env_extra=env, awk_dir=awk_dir)
-        gi = (repo / ".gitignore").read_text() if (repo / ".gitignore").exists() else ""
+        gi = read_gi(repo)
         check(f"[{label}] big file gitignored", "/data dir/big file.csv" in gi, f"gi={gi!r} out={out!r} err={err!r}")
         try:
             j = json.loads(out)
@@ -279,7 +284,7 @@ def test_gitignore(shell, awk_dir, label):
 
         # Same file again: no duplicate entry.
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(big), "content": "x"}, session_id=sid), env_extra=env, awk_dir=awk_dir)
-        gi2 = (repo / ".gitignore").read_text()
+        gi2 = read_gi(repo)
         check(f"[{label}] no duplicate", gi2.count("/data dir/big file.csv") == 1, gi2)
 
         # Tracked big file: left alone.
@@ -288,28 +293,28 @@ def test_gitignore(shell, awk_dir, label):
         git(repo, "add", "tracked_big.bin")
         git(repo, "commit", "-qm", "big")
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(tracked), "content": "x"}, session_id=sid), env_extra=env, awk_dir=awk_dir)
-        check(f"[{label}] tracked left alone", "tracked_big.bin" not in (repo / ".gitignore").read_text())
+        check(f"[{label}] tracked left alone", "tracked_big.bin" not in read_gi(repo))
 
         # LFS-managed path: left alone.
         (repo / ".gitattributes").write_text("*.psd filter=lfs diff=lfs merge=lfs -text\n")
         lfs = repo / "art.psd"
         make_big(lfs, 51)
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(lfs), "content": "x"}, session_id=sid), env_extra=env, awk_dir=awk_dir)
-        check(f"[{label}] LFS left alone", "art.psd" not in (repo / ".gitignore").read_text())
+        check(f"[{label}] LFS left alone", "art.psd" not in read_gi(repo))
 
         # Special characters in a name are escaped in the pattern.
         weird = repo / ("a[1].bin" if os.name == "nt" else "a[1]*.bin")   # Windows forbids * in names
         make_big(weird, 51)
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(weird), "content": "x"}, session_id=sid), env_extra=env, awk_dir=awk_dir)
         st = subprocess.run(["git", "status", "--porcelain"], cwd=repo, capture_output=True, text=True).stdout
-        check(f"[{label}] glob chars escaped and effective", "a[1]" not in st, st + (repo / ".gitignore").read_text())
+        check(f"[{label}] glob chars escaped and effective", "a[1]" not in st, st + read_gi(repo))
 
         # Stop sweep: a big file made through Bash during the session is caught; the pre-session one is not.
         (repo / "downloads").mkdir()
         made = repo / "downloads" / "dump.parquet"
         make_big(made, 60)
         code, out, err = run(shell, script, payload("Stop", session_id=sid, cwd=str(repo / "downloads"), stop_hook_active=False), env_extra=env, awk_dir=awk_dir)
-        gi3 = (repo / ".gitignore").read_text()
+        gi3 = read_gi(repo)
         check(f"[{label}] Stop sweep catches new big file", "/downloads/dump.parquet" in gi3, f"{gi3!r} {out!r} {err!r}")
         check(f"[{label}] Stop sweep skips pre-session file", "old_big.bin" not in gi3, gi3)
         try:
@@ -322,13 +327,13 @@ def test_gitignore(shell, awk_dir, label):
         mid = repo / "mid.bin"
         make_big(mid, 30)
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(mid), "content": "x"}, session_id=sid), env_extra={**env, "FIELD_GUIDE_BIG_FILE_MB": "20"}, awk_dir=awk_dir)
-        check(f"[{label}] custom threshold", "/mid.bin" in (repo / ".gitignore").read_text())
+        check(f"[{label}] custom threshold", "/mid.bin" in read_gi(repo))
 
         # Opt-out.
         off = repo / "off.bin"
         make_big(off, 51)
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(off), "content": "x"}, session_id=sid), env_extra={**env, "FIELD_GUIDE_GITIGNORE_BIG": "off"}, awk_dir=awk_dir)
-        check(f"[{label}] opt-out", "/off.bin" not in (repo / ".gitignore").read_text())
+        check(f"[{label}] opt-out", "/off.bin" not in read_gi(repo))
 
         # Outside any git repo: nothing written anywhere.
         outside = td / "loose"
@@ -419,15 +424,22 @@ def main():
         awk_dirs.append((a, str(d)))
     if not awk_dirs:
         awk_dirs.append(("awk", None))
-    shells = [s for s in SHELLS if shutil.which(s)]
-    print(f"awks: {[a for a, _ in awk_dirs]}  shells: {shells}")
+    # Run each shell by the full path that PATH lookup finds. A bare "bash" on
+    # Windows makes CreateProcess search System32 first, which finds the WSL
+    # launcher instead of Git Bash, so skip anything that resolves there.
+    shells = []
+    for s in SHELLS:
+        exe = shutil.which(s)
+        if exe and not (os.name == "nt" and "\\system32\\" in exe.lower()):
+            shells.append((s, exe))
+    print(f"awks: {[a for a, _ in awk_dirs]}  shells: {[f'{s} ({e})' for s, e in shells]}")
     for a, d in awk_dirs:
-        for sh in shells:
+        for sh, exe in shells:
             label = f"{sh}+{a}"
             print(f"== {label}")
-            test_rm_guard(sh, d, label)
-            test_gitignore(sh, d, label)
-            test_house_rules(sh, d, label)
+            test_rm_guard(exe, d, label)
+            test_gitignore(exe, d, label)
+            test_house_rules(exe, d, label)
     shutil.rmtree(tmp, ignore_errors=True)
     print(f"\n{COUNT - len(FAILS)}/{COUNT} checks passed")
     sys.exit(1 if FAILS else 0)
