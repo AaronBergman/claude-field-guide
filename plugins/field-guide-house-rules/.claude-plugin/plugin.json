@@ -1,0 +1,14 @@
+{
+  "name": "field-guide-house-rules",
+  "displayName": "Field Guide: House Rules",
+  "version": "1.0.0",
+  "description": "Opinionated and optional. Loads the field guide's short list of working preferences (section 21 of abergman.com/ai) into every session, like a CLAUDE.md you can edit, and nudges Claude when it writes em dashes into prose.",
+  "author": {
+    "name": "Aaron Bergman",
+    "url": "https://abergman.com"
+  },
+  "homepage": "https://github.com/AaronBergman/claude-field-guide",
+  "repository": "https://github.com/AaronBergman/claude-field-guide",
+  "license": "MIT",
+  "keywords": ["claude-md", "preferences", "style", "session-start"]
+}

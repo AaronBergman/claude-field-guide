@@ -1,0 +1,29 @@
+{
+  "description": "Field guide house rules: inject the section 21 working preferences from abergman.com/ai (or your edited copy) at session start, and nudge Claude when it writes em dashes into prose files. Each hook can be turned off with an env var; see the README.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/scripts/inject-rules.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/scripts/em-dash-check.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

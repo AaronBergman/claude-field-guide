@@ -1,0 +1,31 @@
+{
+  "name": "abergman",
+  "description": "Aaron Bergman's Claude Code plugins, starting with the field guide \"How I use coding agents\" (abergman.com/ai) packaged as skills, agents, and hooks.",
+  "owner": {
+    "name": "Aaron Bergman",
+    "url": "https://abergman.com"
+  },
+  "plugins": [
+    {
+      "name": "field-guide",
+      "source": "./plugins/field-guide",
+      "description": "Skills and agents: graded research, quote verification, meeting notes to done work, handoffs, weekly updates, delegation briefs, scraping, timelines, adversarial audits, memos, and the guide itself. No hooks, no behavior changes until you use them.",
+      "category": "productivity",
+      "tags": ["research", "verification", "prompting", "meetings"]
+    },
+    {
+      "name": "field-guide-safety",
+      "source": "./plugins/field-guide-safety",
+      "description": "Hooks: block rm and other permanent deletes in favor of the trash, and add files over 50 MB to .gitignore. POSIX sh, fail open, no network.",
+      "category": "security",
+      "tags": ["safety", "hooks", "trash", "gitignore"]
+    },
+    {
+      "name": "field-guide-house-rules",
+      "source": "./plugins/field-guide-house-rules",
+      "description": "Opinionated, optional: loads the guide's short list of working preferences (section 21) into every session, editable, and nudges Claude away from em dashes in prose.",
+      "category": "productivity",
+      "tags": ["claude-md", "preferences", "style"]
+    }
+  ]
+}

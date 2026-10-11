@@ -1,0 +1,14 @@
+{
+  "name": "field-guide-safety",
+  "displayName": "Field Guide: Safety Hooks",
+  "version": "1.0.0",
+  "description": "Two safety hooks from the field guide at abergman.com/ai: block rm and other permanent deletes in favor of the trash, and add files over 50 MB to .gitignore. POSIX sh, fail open, no network.",
+  "author": {
+    "name": "Aaron Bergman",
+    "url": "https://abergman.com"
+  },
+  "homepage": "https://github.com/AaronBergman/claude-field-guide",
+  "repository": "https://github.com/AaronBergman/claude-field-guide",
+  "license": "MIT",
+  "keywords": ["safety", "hooks", "trash", "rm", "gitignore"]
+}

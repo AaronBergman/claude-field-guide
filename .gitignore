@@ -1,0 +1,6 @@
+# Local working notes (may contain machine-specific details)
+HANDOFF.md
+.DS_Store
+__pycache__/
+*.pyc
+dist/

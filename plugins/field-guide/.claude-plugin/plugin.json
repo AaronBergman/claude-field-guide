@@ -1,0 +1,14 @@
+{
+  "name": "field-guide",
+  "displayName": "Field Guide: Skills and Agents",
+  "version": "1.0.0",
+  "description": "The prompt library from \"How I use coding agents\" (abergman.com/ai) as skills: graded research, quote verification, meeting notes to done work, handoffs, weekly updates, delegation briefs, scraping, timelines, adversarial audits, memos, and the guide itself. Plus refuter, quote-checker, and cold-reader agents. No hooks.",
+  "author": {
+    "name": "Aaron Bergman",
+    "url": "https://abergman.com"
+  },
+  "homepage": "https://github.com/AaronBergman/claude-field-guide",
+  "repository": "https://github.com/AaronBergman/claude-field-guide",
+  "license": "MIT",
+  "keywords": ["research", "verification", "prompting", "meetings", "workflow", "field-guide"]
+}
