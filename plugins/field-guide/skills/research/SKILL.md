@@ -26,7 +26,7 @@ The standard here is "measured, not instructed". Telling an agent to be careful 
 - Absence of a result is not evidence of absence. For each null, say which sources you searched and how complete each one is, and name a positive control: something you know is there that the same search did find. A search that fails its positive control tells you nothing.
 - Use absolute dates ("2026-09-22", not "last Tuesday"), and date any number that can change ("as of 2026-10-10").
 - Don't overclaim and don't manufacture findings. "Nothing notable here" is a valid result.
-- Keep evidence and inference visibly separate, especially about motives, payments, or who coordinated with whom.
+- Keep evidence and inference visibly separate, especially for claims about why someone did something or how people and organizations are connected.
 - Respect sites' terms and rate limits. Never automate logins, CAPTCHAs, or paywalls; ask the user instead.
 
 ## Verify in a separate pass
