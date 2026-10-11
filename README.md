@@ -6,7 +6,7 @@ The guide was written by Claude from Aaron Bergman's own prompt history and setu
 
 ## Install
 
-In Claude Code (terminal, desktop app Code tab, or IDE extension):
+In Claude Code (terminal, desktop app Code tab, or IDE extension), one command at a time:
 
 ```
 /plugin marketplace add AaronBergman/claude-field-guide
@@ -20,7 +20,7 @@ Optional and opinionated (it changes how Claude behaves in every session):
 /plugin install field-guide-house-rules@abergman
 ```
 
-Or from your shell:
+Or from your shell (this block is safe to paste all at once):
 
 ```sh
 claude plugin marketplace add AaronBergman/claude-field-guide
