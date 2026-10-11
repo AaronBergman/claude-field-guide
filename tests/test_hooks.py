@@ -298,7 +298,7 @@ def test_gitignore(shell, awk_dir, label):
         check(f"[{label}] LFS left alone", "art.psd" not in (repo / ".gitignore").read_text())
 
         # Special characters in a name are escaped in the pattern.
-        weird = repo / "a[1]*.bin"
+        weird = repo / ("a[1].bin" if os.name == "nt" else "a[1]*.bin")   # Windows forbids * in names
         make_big(weird, 51)
         run(shell, script, payload("PostToolUse", "Write", {"file_path": str(weird), "content": "x"}, session_id=sid), env_extra=env, awk_dir=awk_dir)
         st = subprocess.run(["git", "status", "--porcelain"], cwd=repo, capture_output=True, text=True).stdout
