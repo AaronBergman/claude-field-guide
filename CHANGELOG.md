@@ -2,6 +2,10 @@
 
 All three plugins share one version number and are released together. Dates are YYYY-MM-DD.
 
+## 1.0.1 (2026-11-09)
+
+- **field-guide**: the bundled guide is synced to its 2026-11-09 version, which adds the multi-subscription router for Claude Code ([claude-max-overflow](https://github.com/AaronBergman/claude-max-overflow)) to sections 3, 16 and 19. No changes to skills, agents or hooks.
+
 ## 1.0.0 (2026-10-10)
 
 First release.
